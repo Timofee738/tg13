@@ -6,4 +6,4 @@ users_router = Router()
 
 @users_router.message(CommandStart())
 async def start_cmd(message: Message):
-    await message.answer(f"Hello, welcome to this bot.\n\nYou succesfully registered:\nid: {message.from_user.id}\nusername: {message.from_user.username}")
+    await message.answer(f"Hello, welcome to this bot.\n\n")

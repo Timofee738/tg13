@@ -2,14 +2,13 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message
 
 from database.models.users import Users
-from database.dao.users import UsersDao
 
 from typing import Any, Awaitable, Callable, Dict
 
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import select
 
-class RegMidleware(BaseMiddleware):
+class RegMiddleware(BaseMiddleware):
     def __init__(self, session: async_sessionmaker):
         super().__init__()
         self.session = session
@@ -43,6 +42,8 @@ class RegMidleware(BaseMiddleware):
                 session.add(user)
                 await session.commit()
                 await session.refresh(user)
+                
+                await event.answer(f"✅ You succesfully registered ✅\n\n🆔 id: {tg_user.id}\n👤 username: {tg_user.username}")
                 
             data["session"] = session
             data["user"] = user

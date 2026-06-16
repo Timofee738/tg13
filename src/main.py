@@ -8,15 +8,17 @@ from src.bot.handler import get_handlers_router
 from database.connect import async_session
 
 
-from src.bot.midlewares.RegMidleware import RegMidleware
+from src.bot.midlewares.RegMidleware import RegMiddleware
 
 async def main():
     
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
     
-    dp.include_router(get_handlers_router())
-    dp.message.outer_middleware(RegMidleware(async_session))
+    dp.include_router(await get_handlers_router())
+    dp.message.outer_middleware(RegMiddleware(async_session))
+    
+    
 
     await dp.start_polling(bot, drop_pending_updates=True)
 
