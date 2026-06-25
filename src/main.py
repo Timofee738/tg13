@@ -16,7 +16,9 @@ async def main():
     dp = Dispatcher()
     
     dp.include_router(await get_handlers_router())
-    dp.message.outer_middleware(RegMiddleware(async_session))
+    
+    dp.message.outer_middleware(RegMiddleware(session=async_session))
+    dp.callback_query.outer_middleware(RegMiddleware(session=async_session))
     
     
 

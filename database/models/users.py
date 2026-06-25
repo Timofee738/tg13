@@ -1,7 +1,9 @@
 from database.connect import Base
 
+from typing import Optional
+
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import BigInteger, func
+from sqlalchemy import BigInteger, func, DateTime
 
 from datetime import datetime
 
@@ -15,4 +17,7 @@ class Users(Base):
     
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     
-    is_admin: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
+    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    is_admin: Mapped[bool] = mapped_column(default=False, nullable=True)

@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     
     ADMINS: list[int]
+    
+    PRIVATE_ID: int
 
 
     @property
