@@ -1,9 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from datetime import datetime
+from datetime import date
 
 from src.config import settings
 
@@ -65,7 +63,7 @@ async def proile(callback: CallbackQuery, user: Users, session: AsyncSession):
         await session.commit()
         text += "\n\n(Ваше имя в базе данных было обновлено!)" 
         
-    if not user.end_date or user.end_date < datetime.now():
+    if not user.end_date or user.end_date < date.today():
         text += "❌ У вас нет активной подписки! Пожалуйста, оплатите её в профиле."
         await callback.message.edit_text(text=text, reply_markup=back_builder.as_markup())
         return

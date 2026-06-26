@@ -9,6 +9,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from database.models.users import Users
+from database.models.payments import Payments
 from database.connect import Base
 
 from src.config import settings
