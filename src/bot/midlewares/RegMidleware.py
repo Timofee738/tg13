@@ -20,13 +20,11 @@ class RegMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         
-        # 1. Проверяем, что событие имеет пользователя (Message или CallbackQuery)
         if not hasattr(event, "from_user") or event.from_user is None:
             return await handler(event, data)
             
         tg_user = event.from_user
         
-        # 2. Работаем с базой данных универсально для любого события
         async with self.session() as session:
             result = await session.execute(
                 select(Users).where(Users.tg_id == tg_user.id)
@@ -43,11 +41,9 @@ class RegMiddleware(BaseMiddleware):
                 await session.commit()
                 await session.refresh(user)
                 
-                # Отправляем приветствие только если это было текстовое сообщение
                 if isinstance(event, Message):
                     await event.answer(f"✅ Вы успешно зарегистрировались ✅\n\n🆔 id: {tg_user.id}\n👤 username: {tg_user.username}")
                 
-            # Прокидываем данные в ЛЮБОЙ хендлер (и для сообщений, и для кнопок)
             data["session"] = session
             data["user"] = user
             

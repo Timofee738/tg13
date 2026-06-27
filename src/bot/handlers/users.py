@@ -6,8 +6,7 @@ from datetime import date
 from src.config import settings
 
 from database.models.users import Users
-
-from sqlalchemy.ext.asyncio import AsyncSession
+from database.dao.users import UsersDao
 
 from src.bot.keywords.users import main_builder, sub_builder, back_builder
 
@@ -50,23 +49,38 @@ async def choose_sub(callback: CallbackQuery):
     )
     
 @users_router.callback_query(F.data == "profile")
-async def proile(callback: CallbackQuery, user: Users, session: AsyncSession):
+async def proile(callback: CallbackQuery, user: Users):
     await callback.answer()
+    
+    name_updated_text = ""
+    current_first_name = callback.from_user.first_name
+    
+    
+    if user.first_name != current_first_name:
+        await UsersDao.edit_data(
+            filter_by={"tg_id": user.tg_id},
+            first_name=current_first_name
+        )
+        user.first_name=current_first_name
+        name_updated_text = "\n\n<i>(Ваше имя в базе данных было автоматически обновлено!)</i>"
+        
+        
     text = (
-        f"👤 Твой профиль:\n"
+        f"👤 <b>Твой профиль:</b>\n"
         f"• Имя: {user.first_name}\n"
         f"• Username: @{user.username if user.username else 'нет'}\n"
-        f"• Telegram ID: {user.tg_id}\n\n"
+        f"• Telegram ID: <code>{user.tg_id}</code>\n"
+        f"• Подписка активна до: <code>{user.end_date if user.end_date else 'Нет подписки'}</code>"
+        f"{name_updated_text}\n\n"
     )
-    if user.first_name != callback.from_user.first_name:
-        user.first_name = callback.from_user.first_name
-        await session.commit()
-        text += "\n\n(Ваше имя в базе данных было обновлено!)" 
-        
+    
+    
+    
     if not user.end_date or user.end_date < date.today():
         text += "❌ У вас нет активной подписки! Пожалуйста, оплатите её в профиле."
-        await callback.message.edit_text(text=text, reply_markup=back_builder.as_markup())
+        await callback.message.edit_text(text=text, parse_mode="HTML", reply_markup=back_builder.as_markup())
         return
+    
     
     try:
         invite_link = await callback.bot.create_chat_invite_link(
@@ -83,8 +97,9 @@ async def proile(callback: CallbackQuery, user: Users, session: AsyncSession):
     except Exception as e:
         text += "⚠️ Произошла ошибка при создании ссылки. Обратитесь к администратору."
         print(f"Ошибка создания ссылки: {e}")
-
-    await callback.message.edit_text(text=text, reply_markup=back_builder.as_markup())
+        
+        
+    await callback.message.edit_text(text=text, parse_mode="HTML", reply_markup=back_builder.as_markup())
 
     
     
