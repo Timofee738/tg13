@@ -77,7 +77,7 @@
 ### 1. Клонирование репозитория
 ```bash
 git clone https://github.com
-cd tg-subscription-bot
+cd tg13
 ```
 
 ### 2. Настройка переменных окружения
